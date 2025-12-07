@@ -1,1 +1,99 @@
-ÿ
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+}
+
+model Tenant {
+  id                    String             @id @default(uuid())
+  name                  String
+  slug                  String             @unique
+  subscriptionStatus    SubscriptionStatus @default(PENDING)
+  mercadoPagoCustomerId String?
+
+  users         User[]
+  products      Product[]
+  batches       Batch[]
+  subscriptions Subscription[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  CLINIC_ADMIN
+  CLINIC_STAFF
+}
+
+model User {
+  id       String   @id @default(uuid())
+  email    String   @unique
+  name     String?
+  password String?
+  role     UserRole @default(CLINIC_ADMIN)
+  
+  tenantId String?
+  tenant   Tenant?  @relation(fields: [tenantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id            String  @id @default(uuid())
+  name          String
+  description   String?
+  price         Decimal
+  imageUrl      String?
+  sku           String?
+  category      String  @default("Geral")
+  unit          String  @default("unidade")
+  minStockLevel Int     @default(5)
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  batches Batch[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Batch {
+  id             String   @id @default(uuid())
+  quantity       Int
+  expirationDate DateTime
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscription {
+  id            String   @id @default(uuid())
+  mercadoPagoId String?
+  amount        Decimal
+  status        String
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
