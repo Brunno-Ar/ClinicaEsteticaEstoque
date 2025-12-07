@@ -1,24 +1,43 @@
 {
-  "name": "estéticastock-saas",
+  "name": "estetica-saas-next",
+  "version": "0.1.0",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:push": "prisma db push",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
-    "recharts": "^3.5.1",
-    "react-dom": "^19.2.1",
-    "@google/genai": "^1.31.0",
-    "lucide-react": "^0.556.0",
-    "react": "^19.2.1"
+    "@auth/prisma-adapter": "^2.0.0",
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@prisma/client": "^5.0.0",
+    "@supabase/supabase-js": "^2.0.0",
+    "bcryptjs": "^2.4.3",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.300.0",
+    "mercadopago": "^2.0.0",
+    "next": "14.2.0",
+    "next-auth": "^4.24.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.0",
+    "tailwind-merge": "^2.0.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "prisma": "^5.0.0",
+    "tailwindcss": "^3.4.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.3.0"
   }
 }
