@@ -39,6 +39,11 @@ export async function POST(request: Request) {
       category,
       unit,
       minStockLevel,
+      lotCode,
+      quantity,
+      expirationDate,
+      totalCost,
+      unitCost,
     } = body;
 
     if (!name || price === undefined) {
@@ -48,18 +53,33 @@ export async function POST(request: Request) {
       );
     }
 
+    const productData: any = {
+      name,
+      description,
+      price,
+      imageUrl,
+      sku,
+      category: category || "Geral",
+      unit: unit || "unidade",
+      minStockLevel: minStockLevel || 5,
+      tenantId: session.user.tenantId,
+    };
+
+    if (quantity && quantity > 0 && expirationDate) {
+      productData.batches = {
+        create: {
+          lotCode,
+          quantity,
+          expirationDate: new Date(expirationDate),
+          totalCost,
+          unitCost,
+          tenantId: session.user.tenantId,
+        },
+      };
+    }
+
     const product = await db.product.create({
-      data: {
-        name,
-        description,
-        price,
-        imageUrl,
-        sku,
-        category: category || "Geral",
-        unit: unit || "unidade",
-        minStockLevel: minStockLevel || 5,
-        tenantId: session.user.tenantId,
-      },
+      data: productData,
     });
 
     return NextResponse.json(product, { status: 201 });

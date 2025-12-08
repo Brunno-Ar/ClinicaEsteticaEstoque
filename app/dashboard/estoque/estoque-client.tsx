@@ -14,8 +14,11 @@ import {
 
 interface Batch {
   id: string;
+  lotCode?: string | null;
   quantity: number;
   expirationDate: Date;
+  totalCost?: number | null;
+  unitCost?: number | null;
 }
 
 interface Product {
@@ -277,7 +280,8 @@ export function EstoqueClient({ products }: { products: Product[] }) {
                                           className="text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
                                         >
                                           <td className="py-3 pl-2 font-mono font-medium">
-                                            {batch.id.slice(0, 8)}
+                                            {batch.lotCode ||
+                                              batch.id.slice(0, 8)}
                                           </td>
                                           <td className="py-3 font-medium">
                                             {formatDate(batch.expirationDate)}

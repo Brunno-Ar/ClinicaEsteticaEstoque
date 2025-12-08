@@ -32,11 +32,25 @@ export default function NovoProdutoPage() {
         body: JSON.stringify({
           name: formData.get("name"),
           description: formData.get("description"),
-          price: parseFloat(formData.get("price") as string),
+          price: formData.get("price")
+            ? parseFloat(formData.get("price") as string)
+            : 0,
           sku: formData.get("sku") || null,
           category: formData.get("category"),
           unit: formData.get("unit"),
           minStockLevel: parseInt(formData.get("minStockLevel") as string) || 5,
+          // Batch info
+          lotCode: formData.get("lotCode") || null,
+          quantity: formData.get("quantity")
+            ? parseInt(formData.get("quantity") as string)
+            : 0,
+          expirationDate: formData.get("expirationDate") || null,
+          totalCost: formData.get("totalCost")
+            ? parseFloat(formData.get("totalCost") as string)
+            : null,
+          unitCost: formData.get("unitCost")
+            ? parseFloat(formData.get("unitCost") as string)
+            : null,
         }),
       });
 
@@ -115,20 +129,7 @@ export default function NovoProdutoPage() {
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Preço (R$) *
-            </label>
-            <input
-              type="number"
-              name="price"
-              step="0.01"
-              min="0"
-              required
-              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-              placeholder="0.00"
-            />
-          </div>
+          {/* Price field removed as per user request */}
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
@@ -168,6 +169,109 @@ export default function NovoProdutoPage() {
               className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
               placeholder="Descrição do produto..."
             />
+          </div>
+
+          <div className="md:col-span-2 border-t border-slate-200 dark:border-slate-700 pt-6">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-4">
+              Informações do Primeiro Lote
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Número do Lote
+                </label>
+                <input
+                  type="text"
+                  name="lotCode"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="Ex: LOTE123"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Quantidade Inicial
+                </label>
+                <input
+                  type="number"
+                  name="quantity"
+                  min="0"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="0"
+                  onChange={(e) => {
+                    const qty = parseFloat(e.target.value);
+                    const totalInput = document.querySelector(
+                      'input[name="totalCost"]'
+                    ) as HTMLInputElement;
+                    const unitInput = document.querySelector(
+                      'input[name="unitCost"]'
+                    ) as HTMLInputElement;
+
+                    if (totalInput.value && qty > 0) {
+                      unitInput.value = (
+                        parseFloat(totalInput.value) / qty
+                      ).toFixed(2);
+                    }
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Validade
+                </label>
+                <input
+                  type="date"
+                  name="expirationDate"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Custo Total do Lote (R$)
+                </label>
+                <input
+                  type="number"
+                  name="totalCost"
+                  step="0.01"
+                  min="0"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="0.00"
+                  onChange={(e) => {
+                    const total = parseFloat(e.target.value);
+                    const qtyInput = document.querySelector(
+                      'input[name="quantity"]'
+                    ) as HTMLInputElement;
+                    const unitInput = document.querySelector(
+                      'input[name="unitCost"]'
+                    ) as HTMLInputElement;
+
+                    const qty = parseFloat(qtyInput.value);
+                    if (qty > 0 && !isNaN(total)) {
+                      unitInput.value = (total / qty).toFixed(2);
+                    }
+                  }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Custo por Unidade (R$)
+                </label>
+                <input
+                  type="number"
+                  name="unitCost"
+                  step="0.01"
+                  min="0"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-slate-400 mt-1">
+                  Calculado automaticamente (pode ser ajustado)
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
