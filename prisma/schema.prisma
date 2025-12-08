@@ -12,6 +12,8 @@ enum SubscriptionStatus {
   ACTIVE
   PENDING
   SUSPENDED
+  TRIAL
+  CANCELED
 }
 
 model Tenant {
@@ -19,6 +21,7 @@ model Tenant {
   name                  String
   slug                  String             @unique
   subscriptionStatus    SubscriptionStatus @default(PENDING)
+  trialEndsAt           DateTime?
   mercadoPagoCustomerId String?
 
   users         User[]

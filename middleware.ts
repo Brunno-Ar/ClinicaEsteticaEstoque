@@ -17,6 +17,7 @@ export async function middleware(request: NextRequest) {
     "/api/webhooks",
     "/payment-required",
     "/api/auth",
+    "/api/register",
   ];
   if (
     publicRoutes.some((route) => pathname.startsWith(route)) ||
@@ -40,10 +41,17 @@ export async function middleware(request: NextRequest) {
   }
 
   // 4. For regular users, verify Tenant Status
+  if (token.role === "SUPER_ADMIN") {
+    return NextResponse.next();
+  }
+
   const userTenantStatus = (token as any).tenantStatus || "PENDING";
 
-  if (userTenantStatus !== "ACTIVE") {
-    if (pathname === "/payment-required") {
+  if (userTenantStatus !== "ACTIVE" && userTenantStatus !== "TRIAL") {
+    if (
+      pathname === "/payment-required" ||
+      pathname.startsWith("/api/payment")
+    ) {
       return NextResponse.next();
     }
     return NextResponse.redirect(new URL("/payment-required", request.url));

@@ -29,6 +29,10 @@ export const authOptions = {
         });
 
         if (!user || !user.password) {
+          console.error(
+            "Login falhou: Usuário não encontrado ou sem senha",
+            credentials.email
+          );
           throw new Error("Credenciais inválidas");
         }
 
@@ -38,6 +42,10 @@ export const authOptions = {
         );
 
         if (!passwordMatch) {
+          console.error(
+            "Login falhou: Senha incorreta para",
+            credentials.email
+          );
           throw new Error("Credenciais inválidas");
         }
 
@@ -48,6 +56,7 @@ export const authOptions = {
           role: user.role,
           tenantId: user.tenantId,
           tenantStatus: user.tenant?.subscriptionStatus || null,
+          trialEndsAt: user.tenant?.trialEndsAt || null,
         };
       },
     }),
@@ -59,6 +68,7 @@ export const authOptions = {
         token.role = user.role;
         token.tenantId = user.tenantId;
         token.tenantStatus = user.tenantStatus;
+        token.trialEndsAt = user.trialEndsAt;
       }
       return token;
     },
@@ -68,6 +78,7 @@ export const authOptions = {
         session.user.role = token.role as string;
         session.user.tenantId = token.tenantId as string;
         session.user.tenantStatus = token.tenantStatus as string;
+        session.user.trialEndsAt = token.trialEndsAt as string | null;
       }
       return session;
     },

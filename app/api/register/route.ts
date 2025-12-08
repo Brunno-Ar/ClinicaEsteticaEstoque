@@ -48,12 +48,16 @@ export async function POST(request: Request) {
 
     // Create tenant and user in a transaction
     const result = await db.$transaction(async (tx) => {
-      // Create tenant with PENDING status
+      // Create tenant with TRIAL status (14 days)
+      const trialEndsAt = new Date();
+      trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+
       const tenant = await tx.tenant.create({
         data: {
           name: clinicName,
           slug,
-          subscriptionStatus: "PENDING",
+          subscriptionStatus: "TRIAL",
+          trialEndsAt: trialEndsAt,
         },
       });
 
@@ -80,9 +84,12 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Error registering:", error);
+    console.error("❌ ERRO CRÍTICO NO REGISTRO:", error);
+    // @ts-ignore
+    if (error.code) console.error("Código do erro:", error.code);
+
     return NextResponse.json(
-      { error: "Erro ao realizar cadastro" },
+      { error: "Erro interno no servidor ao processar cadastro." },
       { status: 500 }
     );
   }
