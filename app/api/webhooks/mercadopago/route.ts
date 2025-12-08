@@ -7,6 +7,8 @@ import { db } from "@/lib/db";
 // - Uma assinatura é criada
 // - O status da assinatura muda
 
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
