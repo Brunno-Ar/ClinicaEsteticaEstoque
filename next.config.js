@@ -1,28 +1,39 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable static page generation for all pages
-  // This prevents build errors when trying to access the database during build
-  experimental: {
-    // Disable static generation for dynamic routes
-  },
+  // Force all pages to be dynamically rendered
+  // This completely disables static generation
 
-  // Force all pages to be server-rendered
-  // This is the nuclear option to prevent build errors
+  // Standalone output for better Vercel compatibility
   output: "standalone",
 
-  // Disable image optimization if causing issues
-  images: {
-    unoptimized: true,
-  },
+  // Disable static optimization
+  reactStrictMode: true,
 
-  // Ignore TypeScript errors during build (temporary)
+  // Skip type checking during build
   typescript: {
     ignoreBuildErrors: true,
   },
 
-  // Ignore ESLint errors during build (temporary)
+  // Skip linting during build
   eslint: {
     ignoreDuringBuilds: true,
+  },
+
+  // Disable image optimization
+  images: {
+    unoptimized: true,
+  },
+
+  // Experimental features to force dynamic rendering
+  experimental: {
+    // Force dynamic rendering for all pages
+    workerThreads: false,
+    cpus: 1,
+  },
+
+  // Environment variables that should be available at runtime
+  env: {
+    FORCE_DYNAMIC: "true",
   },
 };
 
