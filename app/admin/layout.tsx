@@ -25,29 +25,33 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-slate-100 dark:bg-slate-900">
+    <div className="flex min-h-screen bg-background text-foreground">
       <AdminSidebar />
-      <main className="flex-1 ml-64 p-8 overflow-y-auto">
-        <header className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-xl font-bold text-slate-800 dark:text-white">
-              SaaS Master Dashboard
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm">
-              Bem-vindo ao sistema EstéticaStock.
-            </p>
-          </div>
-          <div className="flex items-center space-x-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-full shadow-sm border border-slate-200 dark:border-slate-700">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300">
-              A
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto pt-16 md:pt-4">
+          <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-xl font-bold text-foreground">
+                SaaS Master Dashboard
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                Bem-vindo ao sistema EstéticaStock.
+              </p>
             </div>
-            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-              EstéticaStock HQ
-            </span>
-          </div>
-        </header>
-        {children}
-      </main>
+            <div className="flex items-center space-x-2 bg-card px-4 py-2 rounded-full shadow-sm border border-border">
+              <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-primary/20 text-primary">
+                A
+              </div>
+              <span className="text-sm font-medium text-foreground">
+                EstéticaStock HQ
+              </span>
+            </div>
+          </header>
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
