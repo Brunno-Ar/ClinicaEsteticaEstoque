@@ -5,6 +5,8 @@ import { db } from "@/lib/db";
 import { Sidebar } from "@/components/layout/sidebar";
 import { TrialBanner } from "@/components/ui/trial-banner";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
