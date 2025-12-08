@@ -3,12 +3,25 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 
+// Preço da assinatura
+const SUBSCRIPTION_PRICE = 49.9;
+
 // API para criar link de pagamento via Mercado Pago
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.tenantId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Verificar se o token do Mercado Pago está configurado
+  const mpToken = process.env.MP_ACCESS_TOKEN;
+  if (!mpToken || mpToken === "APP_USR-...") {
+    console.error("❌ MP_ACCESS_TOKEN não configurado no .env!");
+    return NextResponse.json(
+      { error: "Pagamentos não configurados. Entre em contato com o suporte." },
+      { status: 503 }
+    );
   }
 
   try {
@@ -29,7 +42,7 @@ export async function POST(request: Request) {
           description: "Sistema de gestão de estoque para clínicas estéticas",
           quantity: 1,
           currency_id: "BRL",
-          unit_price: 299.9,
+          unit_price: SUBSCRIPTION_PRICE,
         },
       ],
       payer: {
@@ -46,13 +59,15 @@ export async function POST(request: Request) {
       notification_url: `${process.env.NEXTAUTH_URL}/api/webhooks/mercadopago`,
     };
 
+    console.log("📦 Criando preferência de pagamento para:", tenant.name);
+
     const response = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+          Authorization: `Bearer ${mpToken}`,
         },
         body: JSON.stringify(preference),
       }
@@ -60,14 +75,15 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Mercado Pago error:", errorData);
+      console.error("❌ Mercado Pago error:", errorData);
       return NextResponse.json(
-        { error: "Failed to create payment" },
+        { error: "Erro ao processar pagamento. Tente novamente." },
         { status: 500 }
       );
     }
 
     const data = await response.json();
+    console.log("✅ Preferência criada:", data.id);
 
     return NextResponse.json({
       checkoutUrl: data.init_point,
@@ -75,7 +91,10 @@ export async function POST(request: Request) {
       preferenceId: data.id,
     });
   } catch (error) {
-    console.error("Error creating payment:", error);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    console.error("❌ Error creating payment:", error);
+    return NextResponse.json(
+      { error: "Erro interno. Tente novamente mais tarde." },
+      { status: 500 }
+    );
   }
 }
