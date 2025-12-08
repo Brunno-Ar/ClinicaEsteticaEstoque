@@ -57,8 +57,13 @@ export async function POST(request: Request) {
         failure: `${process.env.NEXTAUTH_URL}/payment-required`,
         pending: `${process.env.NEXTAUTH_URL}/payment-required`,
       },
-      auto_return: "approved",
-      notification_url: `${process.env.NEXTAUTH_URL}/api/webhooks/mercadopago`,
+      // auto_return only works with HTTPS URLs in production
+      ...(process.env.NEXTAUTH_URL?.startsWith("https://") && {
+        auto_return: "approved",
+      }),
+      notification_url: process.env.NEXTAUTH_URL?.startsWith("https://")
+        ? `${process.env.NEXTAUTH_URL}/api/webhooks/mercadopago`
+        : undefined,
     };
 
     console.log("📦 Criando preferência de pagamento para:", tenant.name);
