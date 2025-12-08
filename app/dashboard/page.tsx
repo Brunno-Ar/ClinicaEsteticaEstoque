@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { getTenantId } from "@/lib/get-tenant";
 import { DollarSign, TrendingDown, AlertTriangle, Package } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function DashboardPage() {
   const tenantId = await getTenantId();
 

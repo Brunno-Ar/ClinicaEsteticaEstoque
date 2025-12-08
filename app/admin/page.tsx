@@ -1,7 +1,9 @@
 import { db } from "@/lib/db";
 import { AdminDashboardClient } from "./dashboard-client";
 
-const PLAN_PRICE = 299.9;
+const PLAN_PRICE = 49.9;
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
   const tenants = await db.tenant.findMany({

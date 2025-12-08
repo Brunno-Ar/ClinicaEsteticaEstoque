@@ -1,6 +1,8 @@
 import { db } from "@/lib/db";
 import { ClinicasClient } from "./clinicas-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function ClinicasPage() {
   const tenants = await db.tenant.findMany({
     select: {

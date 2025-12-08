@@ -2,6 +2,8 @@ import { db } from "@/lib/db";
 import { getTenantId } from "@/lib/get-tenant";
 import { EstoqueClient } from "./estoque-client";
 
+export const dynamic = "force-dynamic";
+
 export default async function EstoquePage() {
   const tenantId = await getTenantId();
 
