@@ -3,7 +3,13 @@ import { ClinicasClient } from "./clinicas-client";
 
 export default async function ClinicasPage() {
   const tenants = await db.tenant.findMany({
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      subscriptionStatus: true,
+      trialEndsAt: true,
+      createdAt: true,
       users: {
         select: { name: true, email: true },
         take: 1,

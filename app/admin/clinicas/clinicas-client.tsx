@@ -12,6 +12,7 @@ import {
   X,
   CreditCard,
   AlertOctagon,
+  Clock,
 } from "lucide-react";
 
 interface Tenant {
@@ -19,6 +20,7 @@ interface Tenant {
   name: string;
   slug: string;
   subscriptionStatus: string;
+  trialEndsAt: Date | null;
   createdAt: Date;
   users: { name: string | null; email: string }[];
   _count: { products: number };
@@ -103,35 +105,81 @@ export function ClinicasClient({ tenants }: { tenants: Tenant[] }) {
                 <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">
                   Status Financeiro
                 </h3>
-                <div
-                  className={`p-4 rounded-lg border flex flex-col items-center justify-center text-center h-[120px] ${
-                    selectedTenant.subscriptionStatus === "SUSPENDED"
-                      ? "bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800"
-                      : "bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800"
-                  }`}
-                >
-                  {selectedTenant.subscriptionStatus === "SUSPENDED" ? (
-                    <>
-                      <AlertOctagon className="text-rose-500 mb-2" size={32} />
-                      <span className="font-bold text-rose-700 dark:text-rose-400">
-                        Suspenso
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle
-                        className="text-emerald-500 mb-2"
-                        size={32}
-                      />
-                      <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                        Em dia
-                      </span>
-                      <p className="text-xs text-emerald-600/80 mt-1">
-                        Renova em 30 dias
-                      </p>
-                    </>
-                  )}
-                </div>
+                {(() => {
+                  const status = selectedTenant.subscriptionStatus;
+                  const trialEndsAt = selectedTenant.trialEndsAt;
+
+                  // Calcular dias restantes do trial
+                  let trialDaysLeft = 0;
+                  if (trialEndsAt) {
+                    const diffTime = Math.max(
+                      0,
+                      new Date(trialEndsAt).getTime() - new Date().getTime()
+                    );
+                    trialDaysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                  }
+
+                  if (status === "TRIAL") {
+                    return (
+                      <div className="p-4 rounded-lg border flex flex-col items-center justify-center text-center h-[120px] bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800">
+                        <Clock className="text-indigo-500 mb-2" size={32} />
+                        <span className="font-bold text-indigo-700 dark:text-indigo-400">
+                          Período de Teste
+                        </span>
+                        <p className="text-xs text-indigo-600/80 mt-1">
+                          {trialDaysLeft > 0
+                            ? `${trialDaysLeft} dias restantes`
+                            : "Expirado"}
+                        </p>
+                      </div>
+                    );
+                  } else if (status === "ACTIVE") {
+                    return (
+                      <div className="p-4 rounded-lg border flex flex-col items-center justify-center text-center h-[120px] bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800">
+                        <CheckCircle
+                          className="text-emerald-500 mb-2"
+                          size={32}
+                        />
+                        <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                          Assinatura Ativa
+                        </span>
+                        <p className="text-xs text-emerald-600/80 mt-1">
+                          Pagamento em dia
+                        </p>
+                      </div>
+                    );
+                  } else if (status === "PENDING") {
+                    return (
+                      <div className="p-4 rounded-lg border flex flex-col items-center justify-center text-center h-[120px] bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+                        <AlertOctagon
+                          className="text-amber-500 mb-2"
+                          size={32}
+                        />
+                        <span className="font-bold text-amber-700 dark:text-amber-400">
+                          Aguardando Pagamento
+                        </span>
+                        <p className="text-xs text-amber-600/80 mt-1">
+                          Acesso bloqueado
+                        </p>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div className="p-4 rounded-lg border flex flex-col items-center justify-center text-center h-[120px] bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800">
+                        <AlertOctagon
+                          className="text-rose-500 mb-2"
+                          size={32}
+                        />
+                        <span className="font-bold text-rose-700 dark:text-rose-400">
+                          Suspenso
+                        </span>
+                        <p className="text-xs text-rose-600/80 mt-1">
+                          Acesso bloqueado
+                        </p>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
 
               <div className="col-span-1 md:col-span-2 space-y-2 mt-2">
@@ -229,6 +277,8 @@ export function ClinicasClient({ tenants }: { tenants: Tenant[] }) {
                       ${
                         tenant.subscriptionStatus === "ACTIVE"
                           ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300"
+                          : tenant.subscriptionStatus === "TRIAL"
+                          ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300"
                           : tenant.subscriptionStatus === "PENDING"
                           ? "bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300"
                           : "bg-rose-100 dark:bg-rose-900/30 text-rose-800 dark:text-rose-300"
@@ -236,6 +286,8 @@ export function ClinicasClient({ tenants }: { tenants: Tenant[] }) {
                     >
                       {tenant.subscriptionStatus === "ACTIVE"
                         ? "Ativo"
+                        : tenant.subscriptionStatus === "TRIAL"
+                        ? "Em Teste"
                         : tenant.subscriptionStatus === "PENDING"
                         ? "Pendente"
                         : "Suspenso"}
