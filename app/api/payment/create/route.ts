@@ -6,6 +6,8 @@ import { db } from "@/lib/db";
 // Preço da assinatura
 const SUBSCRIPTION_PRICE = 49.9;
 
+export const dynamic = "force-dynamic";
+
 // API para criar link de pagamento via Mercado Pago
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions);
